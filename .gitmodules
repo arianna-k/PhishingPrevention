@@ -1,0 +1,6 @@
+[submodule "TFIDF_cpp"]
+	path = TFIDF_cpp
+	url = https://github.com/taozhaojie/TFIDF_cpp.git
+[submodule "asc"]
+	path = asc
+	url = https://github.com/anyks/asc.git
