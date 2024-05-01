@@ -10,3 +10,6 @@
 [submodule "Phishing.Database"]
 	path = Phishing.Database
 	url = git@github.com:mitchellkrogza/Phishing.Database.git
+[submodule "url-knife"]
+	path = url-knife
+	url = https://github.com/Andrew-Kang-G/url-knife.git
