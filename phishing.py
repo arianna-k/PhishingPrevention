@@ -59,6 +59,15 @@ def check_attachments(attachments):
                     return True
     return False
 
+def extract_domain(url):
+    if isinstance(url, bytes):
+        url = url.decode('utf-8')  # Convert bytes to string using UTF-8 encoding
+    parsed_url = urlparse(url)
+    if parsed_url.netloc:
+        return parsed_url.netloc
+    else:
+        # For URLs without a scheme (e.g., "www.example.com")
+        return parsed_url.path.split('/')[0]
 
 def check_domains(attachments):
     phishing_file = "ALL-phishing-domains.txt"
@@ -112,6 +121,7 @@ def findMax(mat):
     return maxElement, element_index_x, element_index_y
 
 def unknownLinkChecker(url):
+    domain = extract_domain(url)
     # making requests instance
     reqs = requests.get(url)
     
@@ -176,7 +186,8 @@ def unknownLinkChecker(url):
             query_search += ' '
             counter += 1
         tf_idfArray[element_index_x][element_index_y] = 0.0
-    
+    query_search += domain
+
     print(query_search)
     
     search = GoogleSearch({
@@ -188,7 +199,7 @@ def unknownLinkChecker(url):
     result = search.get_dict()
 
     link_found = False
-    print(result['organic_results'])
+    #print(result['organic_results'])
 
     for item in result['organic_results']:
         link = item['link']
@@ -275,7 +286,8 @@ def main():
         score = 99
     #If a link is not found in the database, run it through the link_checker
     for attachment in email.attachments:
-        if unknownLinkChecker(attachment):
+        domain is attachment.get
+        if unknownLinkChecker(attachment, domain):
             score += 12
         else:
             score += 88
