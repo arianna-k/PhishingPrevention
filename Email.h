@@ -14,8 +14,7 @@ struct Email {
     vector<string> attachments;
 
     //Constructors
-    Email(string sender, string subject, string body, vector<string> attachments);
-    Email(string email);
+    Email(string sender, string subject, string body);
 
     //Function Methods
     void addAttachment(string);

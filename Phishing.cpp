@@ -2,6 +2,8 @@
 #include <iostream>
 #include <sstream>
 #include <cctype>
+#include <fstream>
+
 
 using namespace std;
 
@@ -62,17 +64,40 @@ int main(int argc, char *argv[]){
         cin >> body;
         vector<string> attachments;
         string input;
+        Email email = Email(sender, subject, body);
         cout << "Enter the attachments/ links (Enter one as a time, type Done when there are no more)";
         while (true){
             cin >> input;
             if(input == "done" || input == "Done" || input == "DONE"){
-                
+                break;
+            }
+            else{
+                email.addAttachment(input);
             }
         }
     }
+    else if (argc == 1){
+        string filename = argv[1];
+        ifstream inputFile(filename);
+        if (!inputFile) {
+            std::cerr << "Error: Unable to open file " << filename << std::endl;
+            return 1;
+        }
+        string sender;
+        getline(inputFile, sender);
+        string subject;
+        getline(inputFile, subject);
+        string body;
+        string line;
+        while(getline(inputFile, line)){
+            body += line;
+        }
+        //Add function to search through body and find attachments
+        
+    }
     else{
-        
-        
+        std::cerr << "Usage: One file at a time!" << std::endl;
+        return 1;
     }
     //Go through the emails and return a score
     int score;
