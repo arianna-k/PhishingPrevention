@@ -1,6 +1,7 @@
 #include "Email.h"
 #include <iostream>
 #include <sstream>
+#include <cctype>
 
 using namespace std;
 
@@ -24,9 +25,11 @@ bool hasSuspiciousContent(Email email){
     Urgency: you must change your password at this link
     */
     istringstream iss(body);
+    string Word;
     //Check each word to see if it is a suspicious word 
-    while(iss){
-        
+    while(iss >> Word){
+        string word = tolower(word);
+        if(word == "congratulations" || word == "urgent")
     }
 }
 
