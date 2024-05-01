@@ -10,3 +10,6 @@
 [submodule "url-knife"]
 	path = url-knife
 	url = https://github.com/Andrew-Kang-G/url-knife.git
+[submodule "tf-idf"]
+	path = tf-idf
+	url = https://github.com/Wittline/tf-idf.git
