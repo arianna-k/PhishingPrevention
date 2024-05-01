@@ -21,15 +21,34 @@ def extract_links(text):
     
     return links
 
+def process_file_by_word(filename):
+    try:
+        with open(filename, 'r') as file:
+            # Read the entire file content into a string
+            file_content = file.read()
+    except FileNotFoundError:
+        print(f"Error: Unable to open file {filename}")
+        return
 
+    # Split the file content into words
+    words = file_content.split()
+
+    # Iterate over each word
+    for word in words:
+        # Process each word here
+        print(word)
+    
 def strip_punctuation(text):
     punctuation_chars = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
     translation_table = str.maketrans("", "", punctuation_chars)
     return text.translate(translation_table)
 
 def check_typos(string, dictionary):
-    words = strip_punctuation(string)
+    words = strip_punctuation(string).split()  # Split the string into words
     num_typos = sum(1 for word in words if word.lower() not in dictionary)
+    for word in words:
+        if word.lower() not in dictionary:
+            print(word)
     return num_typos
 
 def check_contents(string):
@@ -107,6 +126,7 @@ def main():
     check_attachments(email.attachments)
 
     print(f"This email is {score}% likely to be a phishing scam!")
+
 
 if __name__ == "__main__":
     main()
