@@ -27,30 +27,24 @@ def findMax(mat):
     # finally return maxElement
     return maxElement, element_index_x, element_index_y
 
-#driver code
-if __name__ == "__main__":
-    # assign documents
- 
-    # target url
-    url = 'https://www.geeksforgeeks.org/'
-    
+def unknownLinkChecker(url):
     # making requests instance
     reqs = requests.get(url)
     
     # using the BeautifulSoup module
     soup = BeautifulSoup(reqs.text, 'html.parser')
-    
+
+    # assign documents
     # Find the title
     for title in soup.find_all('title'):
         print(title.get_text())
         d0 = title.get_text()
     #Extract the metadata
     d1 = soup.find_all('meta')
-    #Extract the body text
-    d1= str(d1) 
-
+    d1= str(d1)
+    #Extract the body text 
     d2 = soup.get_text()
-    print(d2)
+    #print(d2)
     
     # merge documents into a single corpus
     string = [d0, d1, d2]
@@ -62,21 +56,21 @@ if __name__ == "__main__":
     result = tfidf.fit_transform(string)
     
     # get idf values
-    print('\nidf values:')
-    for ele1, ele2 in zip(tfidf.get_feature_names(), tfidf.idf_):
-        print(ele1, ':', ele2)
+    # print('\nidf values:')
+    # for ele1, ele2 in zip(tfidf.get_feature_names(), tfidf.idf_):
+    #     print(ele1, ':', ele2)
     
-    # get indexing
-    print('\nWord indexes:')
-    print(tfidf.vocabulary_)
+    # # get indexing
+    # print('\nWord indexes:')
+    # print(tfidf.vocabulary_)
     
-    # display tf-idf values
-    print('\ntf-idf value:')
-    print(result)
+    # # display tf-idf values
+    # print('\ntf-idf value:')
+    # print(result)
     
-    # in matrix form
-    print('\ntf-idf values in matrix form:')
-    print(result.toarray())
+    # # in matrix form
+    # print('\ntf-idf values in matrix form:')
+    # print(result.toarray())
 
     print('\ntf-idf values after weighting:')
 
@@ -89,7 +83,7 @@ if __name__ == "__main__":
     print(tf_idfArray)
     query_search = ''
     counter = 0
-    while counter < 5:
+    while counter < 7:
         maxElement, element_index_x, element_index_y = findMax(tf_idfArray)
         print(findMax(tf_idfArray))
         word = list(tfidf.vocabulary_.keys())[list(tfidf.vocabulary_.values()).index(element_index_y)]
@@ -101,13 +95,34 @@ if __name__ == "__main__":
     
     print(query_search)
     
+    search = GoogleSearch({
+        "q": query_search, 
+        "location": "Richmond,Virginia",
+        "api_key": "7b7162d3bb3850756a751d4a66c57d0c8db9129aff7f4e503a4b7dd07bcd9378",
+        "num" : 50
+    })
+    result = search.get_dict()
 
+    link_found = False
+    print(result['organic_results'])
 
-# search = GoogleSearch({
-#     "q": "coffee", 
-#     "location": "Richmond,Virginia",
-#     "api_key": "7b7162d3bb3850756a751d4a66c57d0c8db9129aff7f4e503a4b7dd07bcd9378"
-#   })
-# result = search.get_dict()
+    for item in result['organic_results']:
+        link = item['link']
+        if link == url:
+            print('found link')
+            link_found = True
+            break
+        link = item['displayed_link']
+        if link == url:
+            print('found link')
+            link_found = True
+            break
 
-# print(result)
+    return(link_found)
+
+#driver code
+if __name__ == "__main__":
+ 
+    # target url
+    url = 'https://www.geeksforgeeks.org/'
+
