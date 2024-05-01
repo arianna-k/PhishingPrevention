@@ -34,7 +34,7 @@ def check_typos(string, dictionary):
 
 def check_contents(string):
     words = strip_punctuation(string)
-    suspicious = {"congratulations", "urgent", "must", "now", "fail", "failed", "payment", "purchase", "required", "action"}
+    suspicious = {"congratulations", "urgent", "request", "now", "fail", "failed", "payment", "purchase", "required", "action"}
     return any(word.lower() in suspicious for word in string.split())
 
 def check_attachments(attachments):
