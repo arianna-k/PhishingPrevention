@@ -1,8 +1,8 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 import sys
-from serpapi import GoogleSearch
+#from serpapi import GoogleSearch
 import requests
-from bs4 import BeautifulSoup
+#from bs4 import BeautifulSoup
 import string
 import re
 from urllib.parse import urlparse
@@ -18,6 +18,8 @@ class Email:
         self.attachments.append(attachment)
 
 def extract_domain(url):
+    if isinstance(url, bytes):
+        url = url.decode('utf-8')  # Convert bytes to string using UTF-8 encoding
     parsed_url = urlparse(url)
     if parsed_url.netloc:
         return parsed_url.netloc
@@ -272,10 +274,13 @@ def main():
     if check_contents(email.body):
         score += 5
 
+    url = "https://www.example.com/path/to/page"
+    domain = extract_domain(url)
+    print(domain)  # Output: www.example.com
 
     #If a link is not found in the database, run it through the link_checker
     for attachment in email.attachments:
-        extract_domain(attachment)
+        domain = extract_domain(attachment)
         if check_attachment(domain):
             score = 99
         elif unknownLinkChecker(attachment):
