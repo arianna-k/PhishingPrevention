@@ -1,4 +1,6 @@
 import sys
+import string
+import re
 
 class Email:
     def __init__(self, sender, subject, body):
@@ -10,20 +12,48 @@ class Email:
     def add_attachment(self, attachment):
         self.attachments.append(attachment)
 
+def extract_links(text):
+    # Define a regular expression pattern to match URLs
+    url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+
+    # Find all matches of the URL pattern in the text
+    links = re.findall(url_pattern, text)
+    
+    return links
+
+def process_file_by_word(filename):
+    try:
+        with open(filename, 'r') as file:
+            # Read the entire file content into a string
+            file_content = file.read()
+    except FileNotFoundError:
+        print(f"Error: Unable to open file {filename}")
+        return
+
+    # Split the file content into words
+    words = file_content.split()
+
+    # Iterate over each word
+    for word in words:
+        # Process each word here
+        print(word)
+    
 def strip_punctuation(text):
-    punctuation_chars = "!#$%&'()*+,-./:;<=>?@`{|}"
-    return ''.join(char for char in text if char not in punctuation_chars)
+    punctuation_chars = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
+    translation_table = str.maketrans("", "", punctuation_chars)
+    return text.translate(translation_table)
 
 def check_typos(string, dictionary):
-    words = string.split()
-    words = strip_punctuation(words)
+    words = strip_punctuation(string).split()  # Split the string into words
     num_typos = sum(1 for word in words if word.lower() not in dictionary)
+    for word in words:
+        if word.lower() not in dictionary:
+            print(word)
     return num_typos
 
 def check_contents(string):
-    words = string.split()
-    words = strip_punctuation(words)
-    suspicious = {"congratulations", "urgent", "must", "now", "fail", "failed", "payment", "purchase", "required", "action"}
+    words = strip_punctuation(string)
+    suspicious = {"congratulations", "urgent", "request", "now", "fail", "failed", "payment", "purchase", "required", "action"}
     return any(word.lower() in suspicious for word in string.split())
 
 def check_attachments(attachments):
@@ -92,9 +122,11 @@ def main():
         score += 10
 
     # Check all attachments for suspicious links
+    print(extract_links(email.body))
     check_attachments(email.attachments)
 
     print(f"This email is {score}% likely to be a phishing scam!")
+
 
 if __name__ == "__main__":
     main()
