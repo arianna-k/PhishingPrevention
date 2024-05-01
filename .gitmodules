@@ -4,3 +4,9 @@
 [submodule "asc"]
 	path = asc
 	url = https://github.com/anyks/asc.git
+[submodule "link-meta-extractor"]
+	path = link-meta-extractor
+	url = https://github.com/stackblogger/link-meta-extractor.git
+[submodule "Phishing.Database"]
+	path = Phishing.Database
+	url = git@github.com:mitchellkrogza/Phishing.Database.git
