@@ -13,30 +13,9 @@ class Email:
         self.attachments.append(attachment)
 
 def extract_links(text):
-    # Define a regular expression pattern to match URLs
     url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
-
-    # Find all matches of the URL pattern in the text
     links = re.findall(url_pattern, text)
-    
     return links
-
-def process_file_by_word(filename):
-    try:
-        with open(filename, 'r') as file:
-            # Read the entire file content into a string
-            file_content = file.read()
-    except FileNotFoundError:
-        print(f"Error: Unable to open file {filename}")
-        return
-
-    # Split the file content into words
-    words = file_content.split()
-
-    # Iterate over each word
-    for word in words:
-        # Process each word here
-        print(word)
     
 def strip_punctuation(text):
     punctuation_chars = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
@@ -48,7 +27,6 @@ def check_typos(string, dictionary):
     num_typos = sum(1 for word in words if word.lower() not in dictionary)
     for word in words:
         if word.lower() not in dictionary:
-            print(word)
     return num_typos
 
 def check_contents(string):
@@ -57,8 +35,24 @@ def check_contents(string):
     return any(word.lower() in suspicious for word in string.split())
 
 def check_attachments(attachments):
-    # Implement this function to check attachments for suspicious links
-    pass
+    phishing_file = "ALL-phishing-domains.txt"
+    try:
+        with open(phishing_file, 'r') as file:
+            phishing_URLS = set(line.strip() for line in file)
+    except FileNotFoundError:
+        print(f"Error: Unable to open file {phishing_file}")
+        return
+    
+    for attachment_list in attachments:
+        for attachment in attachment_list:
+            domains = attachment.split("//")[-1].split("/")
+            if len(domains) >= 2:
+                domain = domains[0]
+                if domain in phishing_URLS:
+                    return True
+    return False
+
+    
 
 def main():
     dictionary_file = "dictionary.txt"
@@ -84,6 +78,7 @@ def main():
                 attachments.append(attachment)
         email = Email(sender, subject, body)
         email.attachments = attachments
+        email.attachments.append(extract_links(email.body))
 
     elif len(sys.argv) == 2:
         filename = sys.argv[1]
@@ -98,7 +93,7 @@ def main():
             return
 
         email = Email(sender, subject, body)
-        email.attachments = attachments
+        email.attachments = extract_links(email.body)
 
     else:
         print("Usage: One file at a time!")
@@ -107,23 +102,24 @@ def main():
     score = 0
     # Check for Typos
     typos= check_typos(email.body, dictionary)
-    print(typos)
     if typos > 20:
-        score += 15
-    elif typos > 10:
         score += 10
-    elif typos > 5:
+    elif typos > 10:
         score += 5
-    elif typos > 1:
+    elif typos > 5:
         score += 2
 
     # Check for suspicious words
     if check_contents(email.subject):
         score += 10
+    
+    if check_contents(email.body):
+        score += 5
 
     # Check all attachments for suspicious links
-    print(extract_links(email.body))
-    check_attachments(email.attachments)
+    phishingURL = check_attachments(email.attachments)
+    if phishingURL == True:
+        score = 99
 
     print(f"This email is {score}% likely to be a phishing scam!")
 
