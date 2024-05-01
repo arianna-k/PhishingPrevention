@@ -15,6 +15,7 @@ class Email:
 def extract_links(text):
     url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
     links = re.findall(url_pattern, text)
+    print(links)
     return links
     
 def strip_punctuation(text):
@@ -27,6 +28,7 @@ def check_typos(string, dictionary):
     num_typos = sum(1 for word in words if word.lower() not in dictionary)
     for word in words:
         if word.lower() not in dictionary:
+            num_typos += 1
     return num_typos
 
 def check_contents(string):
@@ -45,12 +47,47 @@ def check_attachments(attachments):
     
     for attachment_list in attachments:
         for attachment in attachment_list:
-            domains = attachment.split("//")[-1].split("/")
+            domain = attachment.split("//")[-1].split("/")
             if len(domains) >= 2:
                 domain = domains[0]
+                print(domain)
                 if domain in phishing_URLS:
                     return True
     return False
+
+
+def check_domains(attachments):
+    phishing_file = "ALL-phishing-domains.txt"
+    try:
+        with open(phishing_file, 'r') as file:
+            phishing_URLS = set(line.strip() for line in file)
+            print(phishing_URLS)
+    except FileNotFoundError:
+        print(f"Error: Unable to open file {phishing_file}")
+        return
+    
+    for attachment_list in attachments:
+        for attachment in attachment_list:
+            # Split the URL into parts based on the URL structure
+            parts = attachment.split("//")[-1].split("/")
+            if len(parts) >= 2:
+                # Extract domain and subdomains
+                domain_parts = parts[0].split(".")
+                
+                # Extract top-level domain (TLD) and second-level domain (SLD)
+                tld = domain_parts[-1]  # Last part is the TLD
+                sld = domain_parts[-2] if len(domain_parts) > 1 else ""  # Second-to-last part is the SLD, if available
+
+                # Print extracted TLD and SLD for debugging
+                # print("TLD:", tld)
+                # print("SLD:", sld)
+                
+                # Check if the TLD or SLD is in the phishing URLs set
+                if tld in phishing_URLS or sld in phishing_URLS:
+                    return True
+    return False
+
+
 
     
 
@@ -117,6 +154,7 @@ def main():
         score += 5
 
     # Check all attachments for suspicious links
+    print(attachments)
     phishingURL = check_attachments(email.attachments)
     if phishingURL == True:
         score = 99
