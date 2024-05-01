@@ -10,13 +10,20 @@ class Email:
     def add_attachment(self, attachment):
         self.attachments.append(attachment)
 
+def strip_punctuation(text):
+    punctuation_chars = "!#$%&'()*+,-./:;<=>?@`{|}"
+    return ''.join(char for char in text if char not in punctuation_chars)
+
 def check_typos(string, dictionary):
     words = string.split()
+    words = strip_punctuation(words)
     num_typos = sum(1 for word in words if word.lower() not in dictionary)
     return num_typos
 
 def check_contents(string):
-    suspicious = {"congratulations", "urgent", "must", "now", "fail", "failed", "payment", "purchase", "required"}
+    words = string.split()
+    words = strip_punctuation(words)
+    suspicious = {"congratulations", "urgent", "must", "now", "fail", "failed", "payment", "purchase", "required", "action"}
     return any(word.lower() in suspicious for word in string.split())
 
 def check_attachments(attachments):
