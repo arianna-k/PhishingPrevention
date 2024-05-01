@@ -1,10 +1,11 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 import sys
-from serpapi import GoogleSearch
+#from serpapi import GoogleSearch
 import requests
-from bs4 import BeautifulSoup
+#from bs4 import BeautifulSoup
 import string
 import re
+from urllib.parse import urlparse
 
 class Email:
     def __init__(self, sender, subject, body):
@@ -15,6 +16,17 @@ class Email:
 
     def add_attachment(self, attachment):
         self.attachments.append(attachment)
+
+def extract_domain(url):
+    if isinstance(url, bytes):
+        url = url.decode('utf-8')  # Convert bytes to string using UTF-8 encoding
+    parsed_url = urlparse(url)
+    if parsed_url.netloc:
+        return parsed_url.netloc
+    else:
+        # For URLs without a scheme (e.g., "www.example.com")
+        return parsed_url.path.split('/')[0]
+
 
 def extract_links(text):
     url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
@@ -40,7 +52,7 @@ def check_contents(string):
     suspicious = {"congratulations", "urgent", "request", "now", "fail", "failed", "payment", "purchase", "required", "action"}
     return any(word.lower() in suspicious for word in string.split())
 
-def check_attachments(attachments):
+def check_attachment(attachment):
     phishing_file = "ALL-phishing-domains.txt"
     try:
         with open(phishing_file, 'r') as file:
@@ -48,15 +60,9 @@ def check_attachments(attachments):
     except FileNotFoundError:
         print(f"Error: Unable to open file {phishing_file}")
         return
-    
-    for attachment_list in attachments:
-        for attachment in attachment_list:
-            domain = attachment.split("//")[-1].split("/")
-            if len(domains) >= 2:
-                domain = domains[0]
-                print(domain)
-                if domain in phishing_URLS:
-                    return True
+        
+    if attachment in phishing_URLS:
+        return True
     return False
 
 def extract_domain(url):
@@ -279,13 +285,16 @@ def main():
     if check_contents(email.body):
         score += 5
 
-    # Check all attachments for suspicious links
-    print(attachments)
-    phishingURL = check_attachments(email.attachments)
-    if phishingURL == True:
-        score = 99
+    url = "https://www.example.com/path/to/page"
+    domain = extract_domain(url)
+    print(domain)  # Output: www.example.com
+
     #If a link is not found in the database, run it through the link_checker
     for attachment in email.attachments:
+        domain = extract_domain(attachment)
+        if check_attachment(domain):
+            score = 99
+        elif unknownLinkChecker(attachment):
         domain is attachment.get
         if unknownLinkChecker(attachment, domain):
             score += 12
