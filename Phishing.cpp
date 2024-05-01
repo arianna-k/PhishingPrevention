@@ -9,10 +9,7 @@ using namespace std;
 
 int numberTypos(Email email){
     string body = email.body;
-    /*Check the body for content that could be suspicious. EX)
-    Too good to be true email: Giving you free stuff
-    Urgency: you must change your password at this link
-    */
+    //Check the body for typos
     istringstream iss(body);
     //Check each word to see if there are typos 
     while(iss){
