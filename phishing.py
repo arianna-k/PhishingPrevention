@@ -31,7 +31,7 @@ def extract_domain(url):
 def extract_links(text):
     url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
     links = re.findall(url_pattern, text)
-    print(links)
+    #print(links)
     return links
     
 def strip_punctuation(text):
@@ -129,7 +129,16 @@ def findMax(mat):
 def unknownLinkChecker(url):
     domain = extract_domain(url)
     # making requests instance
-    reqs = requests.get(url)
+    try:
+        reqs = requests.get(url)
+    except requests.exceptions.MissingSchema:
+        print('URL not recognized, adding schema')
+        url = 'https://' + url
+        try:
+            reqs = requests.get(url)
+        except:
+            print('URL not recognized, assuming that the link is fake')
+            return False
     
     # using the BeautifulSoup module
     soup = BeautifulSoup(reqs.text, 'html.parser')
@@ -211,7 +220,7 @@ def unknownLinkChecker(url):
     result = search.get_dict()
 
     link_found = False
-    print(result['organic_results'])
+    #print(result['organic_results'])
 
     for item in result['organic_results']:
         try:
@@ -263,14 +272,13 @@ def main():
         print(email.attachments)
         print("Enter the attachments/links (Enter one at a time, type 'Done' when finished)")
         while True:
-            print('loop run')
+            #print('loop run')
             attachment = input()
             if attachment.lower() == "done":
                 break
             else:
                 email.attachments.append(attachment)
-                print(email.attachments)
-        print(email.attachments)
+                #print(email.attachments)
 
     elif len(sys.argv) == 2:
         filename = sys.argv[1]
