@@ -1,8 +1,8 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 import sys
-#from serpapi import GoogleSearch
+from serpapi import GoogleSearch
 import requests
-#from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup
 import string
 import re
 from urllib.parse import urlparse
@@ -134,7 +134,7 @@ def unknownLinkChecker(url):
     # using the BeautifulSoup module
     soup = BeautifulSoup(reqs.text, 'html.parser')
 
-    # assign documents
+    # Assign documents
     # Find the title
     for title in soup.find_all('title'):
         print(title.get_text())
@@ -174,6 +174,7 @@ def unknownLinkChecker(url):
 
     print('\ntf-idf values after weighting:')
 
+    #Apply weights: TFIDF(title) * 3, TFIDF(MetaData) * 2
     tf_idfArray = result.toarray()
     for i in range(tf_idfArray[0].size):
         tf_idfArray[0][i] = tf_idfArray[0][i] * 3
@@ -181,21 +182,26 @@ def unknownLinkChecker(url):
         tf_idfArray[0][i] = tf_idfArray[0][i] * 2
 
     print(tf_idfArray)
+    #Create Query
     query_search = ''
     counter = 0
-    while counter < 7:
+    #Pull out the most significant Keywords
+    while counter < 5:
         maxElement, element_index_x, element_index_y = findMax(tf_idfArray)
         print(findMax(tf_idfArray))
         word = list(tfidf.vocabulary_.keys())[list(tfidf.vocabulary_.values()).index(element_index_y)]
+        #Get rid of filler words
         if word != ('for' or 'and' or 'of' or 'the' or 'is'):
             query_search += word
             query_search += ' '
             counter += 1
+        #ensure the same position cannot be taken twice
         tf_idfArray[element_index_x][element_index_y] = 0.0
+    #Add domain to the query search
     query_search += domain
 
     print(query_search)
-    
+    #Create Google Search 
     search = GoogleSearch({
         "q": query_search, 
         "location": "Richmond,Virginia",
@@ -205,22 +211,35 @@ def unknownLinkChecker(url):
     result = search.get_dict()
 
     link_found = False
-    #print(result['organic_results'])
+    print(result['organic_results'])
 
     for item in result['organic_results']:
-        link = item['link']
-        if link == url:
-            print('found link')
-            link_found = True
-            break
-        link = item['displayed_link']
-        if link == url:
-            print('found link')
-            link_found = True
-            break
+        try:
+            link = item['link']
+            if link == url:
+                #print('found link')
+                link_found = True
+                break
+        except KeyError:
+             continue
+        try:
+            link = item['displayed_link']
+            if link == url:
+                #print('found link')
+                link_found = True
+                break
+        except KeyError:
+             continue
+        try:
+            link = item['redirect_link']
+            if link == url:
+                #print('found link')
+                link_found = True
+                break
+        except KeyError:
+             continue
 
-    return(link_found)
-
+    return link_found
     
 
 def main():
@@ -237,17 +256,21 @@ def main():
         sender = input("Enter the sender: ")
         subject = input("Enter the subject: ")
         body = input("Enter the body: ")
-        attachments = []
+        email = Email(sender, subject, body)
+        links = extract_links(email.body)
+        for link in links:
+            email.attachments.append(link)
+        print(email.attachments)
         print("Enter the attachments/links (Enter one at a time, type 'Done' when finished)")
         while True:
+            print('loop run')
             attachment = input()
             if attachment.lower() == "done":
                 break
             else:
-                attachments.append(attachment)
-        email = Email(sender, subject, body)
-        email.attachments = attachments
-        email.attachments.append(extract_links(email.body))
+                email.attachments.append(attachment)
+                print(email.attachments)
+        print(email.attachments)
 
     elif len(sys.argv) == 2:
         filename = sys.argv[1]
@@ -285,18 +308,17 @@ def main():
     if check_contents(email.body):
         score += 5
 
-    url = "https://www.example.com/path/to/page"
-    domain = extract_domain(url)
-    print(domain)  # Output: www.example.com
+    # url = "https://www.example.com/path/to/page"
+    # domain = extract_domain(url)
+    # print(domain)  # Output: www.example.com
 
     #If a link is not found in the database, run it through the link_checker
     for attachment in email.attachments:
+        print(attachment)
         domain = extract_domain(attachment)
         if check_attachment(domain):
             score = 99
         elif unknownLinkChecker(attachment):
-        domain is attachment.get
-        if unknownLinkChecker(attachment, domain):
             score += 12
         else:
             score += 88
