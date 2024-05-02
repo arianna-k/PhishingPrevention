@@ -19,14 +19,21 @@ class Email:
 
 def extract_domain(url):
     if isinstance(url, bytes):
-        url = url.decode('utf-8')  # Convert bytes to string using UTF-8 encoding
+        url = url.decode('utf-8') 
     parsed_url = urlparse(url)
     if parsed_url.netloc:
         return parsed_url.netloc
     else:
-        # For URLs without a scheme (e.g., "www.example.com")
         return parsed_url.path.split('/')[0]
 
+def extract_sender(emailaddress):
+    domain_pattern = r'@([a-zA-Z0-9-]+\.[a-zA-Z]{2,})'
+    domain_match = re.search(domain_pattern, emailaddress)
+    if domain_match:
+        domain = domain_match.group(1)
+        return domain
+    else:
+        return None
 
 def extract_links(text):
     url_pattern = r'(?:http[s]?://)?(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?(?:/[^\s]*)?'
@@ -331,6 +338,11 @@ def main():
             score += 12
         else:
             score += 88
+    
+    domain = extract_sender(sender)
+    if check_attachment(domain):
+        score = 99
+
 
     if score > 99:
         score = 99
