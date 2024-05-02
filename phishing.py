@@ -139,15 +139,18 @@ def unknownLinkChecker(url):
     # making requests instance
     try:
         reqs = requests.get(url)
+    #If the URL is missing the HTTP protocol, add the HTTP schema
     except requests.exceptions.MissingSchema:
         print('URL not recognized, adding schema')
         url = 'https://' + url
         try:
             reqs = requests.get(url)
         except:
+            #if the link is still not recognized, assume that it cannot be found and is likely fake
             print('URL not recognized, assuming that the link is fake')
             return False
     except:
+        #If the program fails to pass the HTTPs handshake, then website likely does not exist on the open web, and is therefore fake.
         print("Connection to Website failed, assuming that the link is fake")
         return False
     # using the BeautifulSoup module
@@ -169,28 +172,11 @@ def unknownLinkChecker(url):
     # merge documents into a single corpus
     string = [d0, d1, d2]
     
-    # create object
+    # create tf-idf object
     tfidf = TfidfVectorizer()
     
     # get tf-df values
     result = tfidf.fit_transform(string)
-    
-    # get idf values
-    # print('\nidf values:')
-    # for ele1, ele2 in zip(tfidf.get_feature_names(), tfidf.idf_):
-    #     print(ele1, ':', ele2)
-    
-    # # get indexing
-    # print('\nWord indexes:')
-    # print(tfidf.vocabulary_)
-    
-    # # display tf-idf values
-    # print('\ntf-idf value:')
-    # print(result)
-    
-    # # in matrix form
-    # print('\ntf-idf values in matrix form:')
-    # print(result.toarray())
 
     print('\ntf-idf values after weighting:')
 
@@ -201,17 +187,19 @@ def unknownLinkChecker(url):
     for i in range(tf_idfArray[1].size):
         tf_idfArray[0][i] = tf_idfArray[0][i] * 2
 
+    #Print result for user
     print(tf_idfArray)
+
     #Create Query
     query_search = ''
     counter = 0
-    #Pull out the most significant Keywords
+    #Pull out the 5 most significant Keywords
     while counter < 5:
         maxElement, element_index_x, element_index_y = findMax(tf_idfArray)
-        print(findMax(tf_idfArray))
+        #print(findMax(tf_idfArray))
         word = list(tfidf.vocabulary_.keys())[list(tfidf.vocabulary_.values()).index(element_index_y)]
         #Get rid of filler words
-        if word != ('for' or 'and' or 'of' or 'the' or 'is'):
+        if word != ('for' or 'and' or 'of' or 'the' or 'is' or 'a'):
             query_search += word
             query_search += ' '
             counter += 1
@@ -219,7 +207,7 @@ def unknownLinkChecker(url):
         tf_idfArray[element_index_x][element_index_y] = 0.0
     #Add domain to the query search
     query_search += domain
-
+    #show user what the searh query will be
     print(query_search)
     #Create Google Search 
     search = GoogleSearch({
@@ -230,10 +218,13 @@ def unknownLinkChecker(url):
     })
     result = search.get_dict()
 
+    #Set return value
     link_found = False
     #print(result['organic_results'])
 
+    #Parse through every object
     for item in result['organic_results']:
+        #Check the links attached to each result and compare to the original URL
         try:
             link = item['link']
             if link == url:
@@ -327,10 +318,6 @@ def main():
     if check_contents(email.body):
         score += 5
 
-    # url = "https://www.example.com/path/to/page"
-    # domain = extract_domain(url)
-    # print(domain)  # Output: www.example.com
-
     #If a link is not found in the database, run it through the link_checker
     for attachment in email.attachments:
         print(attachment)
@@ -355,3 +342,27 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+#Filler code from testing TF-IDF:
+
+    # get idf values
+    # print('\nidf values:')
+    # for ele1, ele2 in zip(tfidf.get_feature_names(), tfidf.idf_):
+    #     print(ele1, ':', ele2)
+    
+    # # get indexing
+    # print('\nWord indexes:')
+    # print(tfidf.vocabulary_)
+    
+    # # display tf-idf values
+    # print('\ntf-idf value:')
+    # print(result)
+    
+    # # in matrix form
+    # print('\ntf-idf values in matrix form:')
+    # print(result.toarray())
+
+#Filler test code for Domains:
+    # url = "https://www.example.com/path/to/page"
+    # domain = extract_domain(url)
+    # print(domain)  # Output: www.example.com
