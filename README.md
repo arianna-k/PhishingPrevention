@@ -3,6 +3,12 @@ CMSC 334 final project! This is a project that will scan emails and look for phi
 
 Borrowed Repositories:
 
-https://github.com/anyks/asc?tab=readme-ov-file : For the Anyks Spell-Checker (ASC)
+[submodule "Phishing.Database"]
+	path = Phishing.Database
+	url = git@github.com:mitchellkrogza/Phishing.Database.git
 
-https://github.com/taozhaojie/TFIDF_cpp: TF-IDF (Frequency Matricization Module)
+Borrowed Tools:
+BeautifulSoup4: https://beautiful-soup-4.readthedocs.io/en/latest/
+
+SerpAPI: https://github.com/serpapi/google-search-results-python
+
