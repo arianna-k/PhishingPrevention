@@ -29,10 +29,11 @@ def extract_domain(url):
 
 
 def extract_links(text):
-    url_pattern = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    url_pattern = r'(?:http[s]?://)?(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\.[a-zA-Z]{2,})?(?:/[^\s]*)?'
     links = re.findall(url_pattern, text)
-    #print(links)
-    return links
+    formatted_links = ["https://" + link if link.startswith("www.") else link for link in links]
+    return formatted_links
+
     
 def strip_punctuation(text):
     punctuation_chars = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"
