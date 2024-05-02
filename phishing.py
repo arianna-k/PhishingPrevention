@@ -147,12 +147,15 @@ def unknownLinkChecker(url):
         except:
             print('URL not recognized, assuming that the link is fake')
             return False
-    
+    except:
+        print("Connection to Website failed, assuming that the link is fake")
+        return False
     # using the BeautifulSoup module
     soup = BeautifulSoup(reqs.text, 'html.parser')
 
     # Assign documents
     # Find the title
+    d0 = ''
     for title in soup.find_all('title'):
         print(title.get_text())
         d0 = title.get_text()

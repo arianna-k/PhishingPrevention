@@ -3,7 +3,7 @@ meeting about code
 Hello professor,
 
 I was hoping to meet with you about the upcomeing assignment! 
-I was using www.geeksforgeeks.com to find some info and I think it help me.
+I was using http://www.geeksforgeeks.org to find some info and I think it help me.
 However I don't knw if the website is trustworthy.
 
 Thank you!
