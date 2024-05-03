@@ -36,3 +36,5 @@ From there, the program implements a TF-IDF vectorization using the sk.learn lib
 Those 5 keywords and then used, along with the URL domain, to create a websearch Query. Our program uses SerpAPI to create a google-search using our formed Query, and then returns the first 50 results into a dictionary of dictionaries. The 'organic_results' dictionary has the data we want, as it returns actual webpages, so we parse through each webpage and compare their URLS, (displayed, redirect, and raw) to the original URL provided in the email. If any of the URLS returned in the websearch matches the email URL, the email URL is probably safe. As the margin of error for this method is around 12%, we add 12 to our email score 12 if our query returns a safe link, and adds 88 to the email score otherwise.
 
 Finally, our Program adds the scores from the spellcheck, domain check, and link check functions into a final score that it returns to the user. If the score gets above 99, we keep the score at 99%, as we can never be 100% sure if a link is phishing.
+
+How to Run: in the terminal write python3 phishing.py <text document> 
